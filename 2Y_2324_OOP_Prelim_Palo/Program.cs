@@ -13,6 +13,20 @@ namespace _2Y_2324_OOP_Prelim_Palo
         static void Main(string[] args)
         {
             string uInput = Method1();
+            List<string> list = new List<string>() {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+            List<string> list2 = new List<string>();
+            foreach(string l in list)
+            {
+                Console.Write(l);
+                list2.Add(l);
+            }
+            Console.ReadKey();
+            Console.WriteLine();
+            foreach (string l in list2)
+            {
+                Console.Write(l);
+            }
+            Console.ReadKey();
 
             // Try to make cipher manually, then try in given program
             // substitution cipher
@@ -63,6 +77,11 @@ namespace _2Y_2324_OOP_Prelim_Palo
             message = Console.ReadLine();
 
             //Encrypt program here
+            cipher = message;
+
+
+
+
             eMessage = message;
 
             WriteFile(eMessage);
