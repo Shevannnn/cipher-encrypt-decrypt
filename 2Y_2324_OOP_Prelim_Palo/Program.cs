@@ -12,35 +12,83 @@ namespace _2Y_2324_OOP_Prelim_Palo
     {
         static void Main(string[] args)
         {
-            string uInput = Method1();
-            List<string> list = new List<string>() {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
-            List<string> list2 = new List<string>();
-            foreach(string l in list)
-            {
-                Console.Write(l);
-                list2.Add(l);
-            }
-            Console.ReadKey();
-            Console.WriteLine();
-            foreach (string l in list2)
-            {
-                Console.Write(l);
-            }
-            Console.ReadKey();
+            //string uInput = Method1();
+            string cipher = "";
+            List<string> initialList = new List<string>() {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+            List<string> cipherList = InitializeList(initialList);
+
+            CheckLists(initialList, cipherList);
 
             // Try to make cipher manually, then try in given program
             // substitution cipher
 
-            if (uInput == "E")
-                Encrypt();
-            else if (uInput == "D")
-                Decrypt();
+            Encrypt(initialList, cipherList);
 
             Console.WriteLine("Press any key to close the program");
             Console.ReadKey();
         }
 
-        static string Method1() 
+        static List<string> InitializeList(List<string> initialList)
+        {
+            List<string> temp = new List<string>();
+            foreach (string l in initialList)
+            {
+                temp.Add(l);
+            }
+            return temp;
+        }
+
+        static void CheckLists(List<string> initialList, List<string> cipherList)
+        {
+            foreach (string l in initialList)
+            {
+                Console.Write(l + ",");
+            }
+            Console.WriteLine("");
+            foreach (string l in cipherList)
+            {
+                Console.Write(l + ",");
+            }
+            Console.WriteLine("\n\nPress any key to cont");
+            Console.ReadKey();
+        }
+
+        static string RemoveDupes(string cipher)
+        {
+            string temp = "";
+            foreach(char c in cipher)
+            {
+                if (!temp.Contains(c))
+                    temp += c;
+            }
+            return temp;
+        }
+
+        static List<string> ReformatList(List<string> cipherList, string cipher)
+        {
+            for (int i = 0; i < cipherList.Count; i++)
+            {
+                for (int j = 0; j < cipher.Length; j++)
+                {
+                    if (cipher[j].ToString() == cipherList[i])
+                    {
+                        cipherList.RemoveAt(i);
+                        j = 0; // start over first letter just to make sure
+                    }
+                }
+            }
+
+            // Insert the key to list
+            for (int j = 0; j < cipher.Length; j++)
+            {
+                cipherList.Insert(j, cipher[j].ToString());
+            }
+
+            return cipherList;
+        }
+
+
+        static string GetuInput() 
         {
             while (true)
             {
@@ -59,7 +107,7 @@ namespace _2Y_2324_OOP_Prelim_Palo
             }
         }
 
-        static void Encrypt()
+        static void Encrypt(List<string> initialList, List<string> cipherList)
         {
             string cipher = "";
             string message = "";
@@ -69,12 +117,19 @@ namespace _2Y_2324_OOP_Prelim_Palo
             Console.ReadKey();
             Console.Clear();
             Console.Write("What is the key you want to set? : ");
-            cipher = Console.ReadLine();
+
+            cipher = Console.ReadLine().ToUpper();
+            cipherList = ReformatList(cipherList, RemoveDupes(cipher));
+
             Console.WriteLine("Cipher has been set.");
             Console.ReadKey();
             Console.Clear();
             Console.WriteLine("Please input the message you want to encrypt :");
             message = Console.ReadLine();
+
+
+
+
 
             //Encrypt program here
             cipher = message;
