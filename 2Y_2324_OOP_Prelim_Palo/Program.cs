@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,30 +13,11 @@ namespace _2Y_2324_OOP_Prelim_Palo
     {
         static void Main(string[] args)
         {
-            //string uInput = Method1();
-            string cipher = "";
             List<string> initialList = new List<string>() {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
             List<string> cipherList = InitializeList(initialList);
 
-            CheckLists(initialList, cipherList);
-
-            // Try to make cipher manually, then try in given program
-            // substitution cipher
-
-            Encrypt(initialList, cipherList);
-
-            Console.WriteLine("Press any key to close the program");
-            Console.ReadKey();
-        }
-
-        static List<string> InitializeList(List<string> initialList)
-        {
-            List<string> temp = new List<string>();
-            foreach (string l in initialList)
-            {
-                temp.Add(l);
-            }
-            return temp;
+            //CheckLists(initialList, cipherList);
+            Choice(initialList, cipherList);
         }
 
         static void CheckLists(List<string> initialList, List<string> cipherList)
@@ -51,6 +33,75 @@ namespace _2Y_2324_OOP_Prelim_Palo
             }
             Console.WriteLine("\n\nPress any key to cont");
             Console.ReadKey();
+        }
+
+        static List<string> InitializeList(List<string> initialList)
+        {
+            List<string> temp = new List<string>();
+            foreach (string l in initialList)
+            {
+                temp.Add(l);
+            }
+            return temp;
+        }
+
+        static void Choice(List<string> initialList, List<string> cipherList)
+        {
+            string key = "";
+            string message = "";
+            string eMessage = "";
+            string uInput = GetuInput();
+
+            Console.WriteLine("Machine Mode has been set.");
+            Console.ReadKey();
+            Console.Clear();
+            Console.Write("What is the key you want to set? : ");
+
+            key = Console.ReadLine().ToUpper();
+            cipherList = ReformatList(cipherList, RemoveDupes(key));
+
+            Console.WriteLine("Cipher has been set.");
+            Console.ReadKey();
+            Console.Clear();
+
+            if (uInput == "E")
+            {
+                Console.WriteLine("Please input the message you want to encrypt :");
+                message = Console.ReadLine().ToUpper();
+                eMessage = Encrypt(message, initialList, cipherList);
+                WriteFile(eMessage);
+            }
+            else if (uInput == "D")
+            {
+                Console.WriteLine("Reading eMessage.txt and decrypting using the provided key.");
+                eMessage = ReadFile();
+                message = Decrypt(eMessage, initialList, cipherList);
+                Console.WriteLine("The decrypted message is: ");
+                Console.WriteLine(eMessage);
+                Console.WriteLine("Message has been successfully decrypted.");
+            }
+
+            Console.WriteLine("Press any key to close the program");
+            Console.ReadKey();
+        }
+
+        static string GetuInput()
+        {
+            while (true)
+            {
+                Console.Write("Would you like to encrypt or decrypt a message? [E / D] : ");
+                string uInput = Console.ReadLine().ToUpper();
+                if (uInput == "E")
+                    return "E";
+                else if (uInput == "D")
+                    return "D";
+                else
+                {
+                    Console.WriteLine("Invalid Setting please try again. Press any key to continue.");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
+            }
         }
 
         static string RemoveDupes(string cipher)
@@ -87,87 +138,62 @@ namespace _2Y_2324_OOP_Prelim_Palo
             return cipherList;
         }
 
-
-        static string GetuInput() 
+        static string Encrypt(string message, List<string> initialList, List<string> cipherList)
         {
-            while (true)
+            List<string> temp = new List<string>();
+            string eMessage = "";
+            List<string> letters = new List<string>();
+
+            foreach (char c in message)
             {
-                Console.Write("Would you like to encrypt or decrypt a message? [E / D] : ");
-                string uInput = Console.ReadLine().ToUpper();
-                if (uInput == "E")
-                    return "E";
-                else if (uInput == "D")
-                    return "D";
+                letters.Add(c.ToString());
+            }
+
+            foreach (string letter in letters)
+            {
+                if (initialList.Contains(letter))
+                {
+                    int index = temp.IndexOf(letter);
+                    temp.Add(cipherList[index]);
+                }
                 else
                 {
-                    Console.WriteLine("Invalid Setting please try again. Press any key to continue.");
-                    Console.ReadKey();
-                    Console.Clear();
+                    temp.Add(letter); // special chars
                 }
             }
+
+            foreach (string letter in temp)
+            {
+                eMessage = letter;
+                //Console.WriteLine(eMessage);
+                //Console.ReadKey();
+            }
+
+            return eMessage;
         }
 
-        static void Encrypt(List<string> initialList, List<string> cipherList)
+        static string Decrypt(string eMessage, List<string> initialList, List<string> cipherList)
         {
-            string cipher = "";
-            string message = "";
-            string eMessage = "";
+            //string message = "";
 
-            Console.WriteLine("Machine Mode has been set.");
-            Console.ReadKey();
-            Console.Clear();
-            Console.Write("What is the key you want to set? : ");
+            List<string> message = new List<string>();
 
-            cipher = Console.ReadLine().ToUpper();
-            cipherList = ReformatList(cipherList, RemoveDupes(cipher));
+            foreach (char c in eMessage)
+            {
+                if (cipherList.Contains(c.ToString()))
+                {
+                    int index = cipherList.IndexOf(c.ToString());
+                    message.Add(initialList[index]);
+                }
+                else
+                {
+                    message.Add(c.ToString()); // special chars
+                }
+            }
 
-            Console.WriteLine("Cipher has been set.");
-            Console.ReadKey();
-            Console.Clear();
-            Console.WriteLine("Please input the message you want to encrypt :");
-            message = Console.ReadLine();
+            return string.Join("", message);
 
-
-
-
-
-            //Encrypt program here
-            cipher = message;
-
-
-
-
-            eMessage = message;
-
-            WriteFile(eMessage);
-            Console.WriteLine("Message has been successfully encrypted and written to eMessage.txt.");
-        }
-
-        static void Decrypt()
-        {
-            string cipher = "";
-            string message = "";
-            string eMessage = "";
-
-            Console.WriteLine("Machine Mode has been set.");
-            Console.ReadKey();
-            Console.Clear();
-            Console.Write("What is the key you want to set? : ");
-            cipher = Console.ReadLine();
-            Console.WriteLine("Cipher has been set.");
-            Console.ReadKey();
-            Console.Clear();
-            Console.WriteLine("Reading eMessage.txt and decrypting using the provided key.");
-
-            ReadFile(out eMessage);
-            //decrypt
-            message = eMessage;
-
-
-
-            Console.WriteLine("The decrypted message is: ");
-            Console.WriteLine(message);
-            Console.WriteLine("Message has been successfully decrypted.");
+            //return message;
         }
 
         static void WriteFile(string eMessage)
@@ -176,12 +202,15 @@ namespace _2Y_2324_OOP_Prelim_Palo
             {
                 sw.Write(eMessage);
             }
+            Console.WriteLine("Message has been successfully encrypted and written to eMessage.txt.");
+
         }
 
-        static void ReadFile(out string eMessage)
+        static string ReadFile()
         {
             string line = "";
             string temp = "";
+            string eMessage = "";
             using (StreamReader sr = new StreamReader("eMessage.txt"))
             {
                 while ((line = sr.ReadLine()) != null)
@@ -189,8 +218,7 @@ namespace _2Y_2324_OOP_Prelim_Palo
                     temp = line;
                 }
             }
-            eMessage = temp;
+            return eMessage = temp;
         }
-
     }
 }
