@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.Remoting.Messaging;
 using System.Security.Authentication;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,7 +60,7 @@ namespace _2Y_2324_OOP_Prelim_Palo
             Console.Write("What is the key you want to set? : ");
 
             key = Console.ReadLine().ToUpper();
-            cipherList = ReformatList(cipherList, RemoveDupes(key));
+            cipherList = ReformatList(initialList, RemoveDupes(key));
 
             Console.WriteLine("Cipher has been set.");
             Console.ReadKey();
@@ -77,7 +79,7 @@ namespace _2Y_2324_OOP_Prelim_Palo
                 eMessage = ReadFile();
                 message = Decrypt(eMessage, initialList, cipherList);
                 Console.WriteLine("The decrypted message is: ");
-                Console.WriteLine(eMessage);
+                Console.WriteLine(message);
                 Console.WriteLine("Message has been successfully decrypted.");
             }
 
@@ -115,85 +117,92 @@ namespace _2Y_2324_OOP_Prelim_Palo
             return temp;
         }
 
-        static List<string> ReformatList(List<string> cipherList, string cipher)
+        static List<string> ReformatList(List<string> initialList, string cipher)
         {
-            for (int i = 0; i < cipherList.Count; i++)
+            List<string> temp = new List<string>();
+            string filter = "";
+            int index = 0;
+
+            // filter special chars
+            foreach (char c in cipher)
             {
-                for (int j = 0; j < cipher.Length; j++)
+                if (c >= 'A' && c <= 'Z')
                 {
-                    if (cipher[j].ToString() == cipherList[i])
-                    {
-                        cipherList.RemoveAt(i);
-                        j = 0; // start over first letter just to make sure
-                    }
+                    filter += c;
+                }
+            }
+            cipher = filter;
+
+            // if letter is not in cipher add it
+            foreach (string c in initialList)
+            {
+                if (!cipher.Contains(c))
+                {
+                    temp.Add(c);
                 }
             }
 
-            // Insert the key to list
-            for (int j = 0; j < cipher.Length; j++)
+            // insert the letters in cipher to the list(no dupes thanks to previous method)
+            foreach (char c in cipher)
             {
-                cipherList.Insert(j, cipher[j].ToString());
+                if (index < temp.Count)
+                {
+                    temp.Insert(index, c.ToString());
+                    index++;
+                }
+                else
+                {
+                    temp.Add(c.ToString());
+                }
             }
 
-            return cipherList;
+            return temp;
         }
 
         static string Encrypt(string message, List<string> initialList, List<string> cipherList)
         {
             List<string> temp = new List<string>();
             string eMessage = "";
-            List<string> letters = new List<string>();
 
             foreach (char c in message)
             {
-                letters.Add(c.ToString());
-            }
+                string letter = c.ToString();
+                int index = initialList.IndexOf(letter);
 
-            foreach (string letter in letters)
-            {
-                if (initialList.Contains(letter))
+                if (index != -1)
                 {
-                    int index = temp.IndexOf(letter);
                     temp.Add(cipherList[index]);
                 }
                 else
                 {
-                    temp.Add(letter); // special chars
+                    temp.Add(letter); // Special characters or spaces remain unchanged
                 }
             }
 
-            foreach (string letter in temp)
-            {
-                eMessage = letter;
-                //Console.WriteLine(eMessage);
-                //Console.ReadKey();
-            }
-
+            eMessage = string.Join("", temp); // Combine the encrypted letters
             return eMessage;
         }
 
         static string Decrypt(string eMessage, List<string> initialList, List<string> cipherList)
         {
-            //string message = "";
-
             List<string> message = new List<string>();
 
             foreach (char c in eMessage)
             {
-                if (cipherList.Contains(c.ToString()))
+                string letter = c.ToString();
+                int index = cipherList.IndexOf(letter);
+
+                if (index != -1)
                 {
-                    int index = cipherList.IndexOf(c.ToString());
                     message.Add(initialList[index]);
                 }
                 else
                 {
-                    message.Add(c.ToString()); // special chars
+                    message.Add(letter); // Special characters or spaces remain unchanged
                 }
             }
 
             return string.Join("", message);
-
-            //return message;
         }
 
         static void WriteFile(string eMessage)
